@@ -1,5 +1,5 @@
 {
-  "name": "SupplyFlow Codespace",
+  "name": "MuzFlow Codespace",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
@@ -7,14 +7,13 @@
   "forwardPorts": [8080, 8000],
   "portsAttributes": {
     "8080": {
-      "label": "SupplyFlow UI",
+      "label": "MuzFlow UI",
       "onAutoForward": "openBrowser"
     },
     "8000": {
-      "label": "SupplyFlow API"
+      "label": "MuzFlow API"
     }
   },
   "postCreateCommand": "docker compose -f docker-compose.yml -f docker-compose.codespaces.yml build",
   "postStartCommand": "docker compose -f docker-compose.yml -f docker-compose.codespaces.yml up -d"
 }
-

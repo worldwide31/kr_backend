@@ -8,7 +8,7 @@ from app.db.session import Base, engine
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="SupplyFlow API",
+        title="MuzFlow API",
         description="API веб-сервиса управления поставками и заказами для оптовых компаний.",
         version="1.0.0",
         docs_url="/api/docs",
