@@ -21,6 +21,23 @@ docker compose up --build
 - API: http://localhost/api
 - Swagger: http://localhost/api/docs
 
+## Демо в GitHub Codespaces
+
+Проект можно показать прямо из GitHub без локальной установки Docker:
+
+1. Откройте репозиторий на GitHub.
+2. Нажмите `Code` -> `Codespaces` -> `Create codespace on main`.
+3. Дождитесь запуска окружения. Docker Compose стартует автоматически.
+4. Откройте вкладку `Ports` и перейдите по порту `8080`.
+
+Если сервисы не стартовали автоматически, выполните в терминале Codespaces:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.codespaces.yml up -d --build
+```
+
+Интерфейс будет доступен на forwarded-порту `8080`, API - на `8000`.
+
 ## Учетные записи
 
 - Администратор: `admin` / `admin123`
