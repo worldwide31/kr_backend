@@ -5,13 +5,27 @@ import { CatalogPage } from "./pages/CatalogPage";
 import { CompaniesPage } from "./pages/CompaniesPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { InventoryPage } from "./pages/InventoryPage";
+import { LoginPage } from "./pages/LoginPage";
 import { OrdersPage } from "./pages/OrdersPage";
 import { SuppliesPage } from "./pages/SuppliesPage";
+import { useAuth } from "./services/auth";
+
+function ProtectedLayout() {
+  const { loading, user } = useAuth();
+  if (loading) {
+    return <div className="grid min-h-screen place-items-center text-ink">Загрузка сессии...</div>;
+  }
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Layout />;
+}
 
 export function App() {
   return (
     <Routes>
-      <Route element={<Layout />}>
+      <Route path="login" element={<LoginPage />} />
+      <Route element={<ProtectedLayout />}>
         <Route index element={<DashboardPage />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="supplies" element={<SuppliesPage />} />
@@ -23,4 +37,3 @@ export function App() {
     </Routes>
   );
 }
-

@@ -114,3 +114,14 @@ export interface ActivityEvent {
   created_at: string;
 }
 
+export type UserRole = "admin" | "operator";
+
+export interface AuthUser {
+  username: string;
+  role: UserRole;
+}
+
+export interface TokenResponse extends AuthUser {
+  access_token: string;
+  token_type: string;
+}

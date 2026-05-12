@@ -6,14 +6,29 @@ import type {
   Order,
   Product,
   Supply,
+  TokenResponse,
   Warehouse
 } from "../types/domain";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "/api";
+let accessToken = localStorage.getItem("access_token");
+
+export function setAccessToken(token: string | null) {
+  accessToken = token;
+  if (token) {
+    localStorage.setItem("access_token", token);
+  } else {
+    localStorage.removeItem("access_token");
+  }
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
   const response = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...init?.headers },
+    headers: { ...headers, ...init?.headers },
     ...init
   });
   if (!response.ok) {
@@ -28,6 +43,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  login: (body: { username: string; password: string }) =>
+    request<TokenResponse>("/auth/login", { method: "POST", body: JSON.stringify(body) }),
+  me: () => request<{ username: string; role: "admin" | "operator" }>("/auth/me"),
   seed: () => request<{ status: string }>("/seed", { method: "POST" }),
   kpi: () => request<DashboardKpi>("/dashboard/kpi"),
   events: () => request<ActivityEvent[]>("/events"),

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import companies, dashboard, events, orders, products, seed, supplies, warehouses
+from app.api import auth, companies, dashboard, events, orders, products, seed, supplies, warehouses
 from app.core.config import settings
 from app.db.session import Base, engine
 
@@ -27,6 +27,7 @@ def create_app() -> FastAPI:
     def on_startup() -> None:
         Base.metadata.create_all(bind=engine)
 
+    app.include_router(auth.router, prefix="/api")
     app.include_router(dashboard.router, prefix="/api")
     app.include_router(companies.router, prefix="/api")
     app.include_router(products.router, prefix="/api")

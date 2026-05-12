@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from app.core.auth import require_roles
 from app.db.session import get_db
 from app.models import InventoryItem, Warehouse
 from app.schemas.warehouse import InventoryRead, WarehouseCreate, WarehouseRead
@@ -13,12 +14,19 @@ router = APIRouter(prefix="/warehouses", tags=["warehouses"])
 
 
 @router.get("", response_model=list[WarehouseRead])
-def list_warehouses(db: Session = Depends(get_db)) -> list[Warehouse]:
+def list_warehouses(
+    db: Session = Depends(get_db),
+    _: dict[str, str] = Depends(require_roles("admin", "operator")),
+) -> list[Warehouse]:
     return list(db.scalars(select(Warehouse).order_by(Warehouse.city, Warehouse.name)))
 
 
 @router.post("", response_model=WarehouseRead, status_code=status.HTTP_201_CREATED)
-async def create_warehouse(payload: WarehouseCreate, db: Session = Depends(get_db)) -> Warehouse:
+async def create_warehouse(
+    payload: WarehouseCreate,
+    db: Session = Depends(get_db),
+    _: dict[str, str] = Depends(require_roles("admin")),
+) -> Warehouse:
     duplicate = db.scalar(select(Warehouse).where(Warehouse.name == payload.name))
     if duplicate:
         raise HTTPException(
@@ -35,7 +43,10 @@ async def create_warehouse(payload: WarehouseCreate, db: Session = Depends(get_d
 
 
 @router.get("/inventory", response_model=list[InventoryRead])
-def list_inventory(db: Session = Depends(get_db)) -> list[dict]:
+def list_inventory(
+    db: Session = Depends(get_db),
+    _: dict[str, str] = Depends(require_roles("admin", "operator")),
+) -> list[dict]:
     items = db.scalars(
         select(InventoryItem)
         .options(selectinload(InventoryItem.product), selectinload(InventoryItem.warehouse))

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.auth import require_roles
 from app.db.session import get_db
 from app.models import Company
 from app.schemas.company import CompanyCreate, CompanyRead
@@ -12,12 +13,19 @@ router = APIRouter(prefix="/companies", tags=["companies"])
 
 
 @router.get("", response_model=list[CompanyRead])
-def list_companies(db: Session = Depends(get_db)) -> list[Company]:
+def list_companies(
+    db: Session = Depends(get_db),
+    _: dict[str, str] = Depends(require_roles("admin", "operator")),
+) -> list[Company]:
     return list(db.scalars(select(Company).order_by(Company.name)))
 
 
 @router.post("", response_model=CompanyRead, status_code=status.HTTP_201_CREATED)
-async def create_company(payload: CompanyCreate, db: Session = Depends(get_db)) -> Company:
+async def create_company(
+    payload: CompanyCreate,
+    db: Session = Depends(get_db),
+    _: dict[str, str] = Depends(require_roles("admin")),
+) -> Company:
     duplicate = db.scalar(select(Company).where((Company.inn == payload.inn) | (Company.name == payload.name)))
     if duplicate:
         raise HTTPException(

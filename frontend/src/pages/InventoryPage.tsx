@@ -3,9 +3,11 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { FieldHint, Notice, PageTitle, Panel, PrimaryButton, StatusBadge, Table, TextInput } from "../components/ui";
 import { api } from "../services/api";
+import { useAuth } from "../services/auth";
 import type { InventoryItem, Warehouse } from "../types/domain";
 
 export function InventoryPage() {
+  const { isAdmin } = useAuth();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [message, setMessage] = useState<{ tone: "success" | "error" | "warning"; text: string } | null>(null);
@@ -37,18 +39,22 @@ export function InventoryPage() {
         «Всего» показывает физический остаток, «Резерв» уже закреплен за заказами, «Доступно» можно продавать новым клиентам.
       </Notice>
       {message && <Notice title={message.tone === "success" ? "Готово" : "Проверьте склад"} tone={message.tone}>{message.text}</Notice>}
-      <Panel className="mb-5 p-4">
-        <form className="grid gap-3 md:grid-cols-5" onSubmit={submit}>
-          <TextInput required placeholder="Склад" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <TextInput required placeholder="Город" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-          <TextInput required placeholder="Адрес" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-          <TextInput placeholder="Ответственный" value={form.manager} onChange={(e) => setForm({ ...form, manager: e.target.value })} />
-          <PrimaryButton className="inline-flex items-center justify-center gap-2"><Plus size={16} /> Склад</PrimaryButton>
-        </form>
-        <FieldHint>
-          Если доступный остаток меньше или равен минимальному уровню товара, система покажет статус «Пополнить».
-        </FieldHint>
-      </Panel>
+      {isAdmin ? (
+        <Panel className="mb-5 p-4">
+          <form className="grid gap-3 md:grid-cols-5" onSubmit={submit}>
+            <TextInput required placeholder="Склад" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <TextInput required placeholder="Город" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+            <TextInput required placeholder="Адрес" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+            <TextInput placeholder="Ответственный" value={form.manager} onChange={(e) => setForm({ ...form, manager: e.target.value })} />
+            <PrimaryButton className="inline-flex items-center justify-center gap-2"><Plus size={16} /> Склад</PrimaryButton>
+          </form>
+          <FieldHint>
+            Если доступный остаток меньше или равен минимальному уровню товара, система покажет статус «Пополнить».
+          </FieldHint>
+        </Panel>
+      ) : (
+        <Notice title="Режим оператора">Вы можете контролировать остатки и резервы. Создание складов доступно администратору.</Notice>
+      )}
       <div className="mb-4 grid gap-3 md:grid-cols-3">
         {warehouses.map((warehouse) => (
           <Panel key={warehouse.id} className="p-4">

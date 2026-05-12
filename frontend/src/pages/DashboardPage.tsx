@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 
 import { PrimaryButton, Stat, Table, PageTitle } from "../components/ui";
 import { api } from "../services/api";
+import { useAuth } from "../services/auth";
 import type { ActivityEvent, DashboardKpi } from "../types/domain";
 
 export function DashboardPage() {
+  const { isAdmin } = useAuth();
   const [kpi, setKpi] = useState<DashboardKpi | null>(null);
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,9 +37,11 @@ export function DashboardPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageTitle title="Операционный обзор" subtitle="Ключевые показатели склада, заказов и поставок в одном рабочем экране." />
         <div className="flex gap-2">
-          <PrimaryButton onClick={seed} className="inline-flex items-center gap-2 bg-ink text-cream hover:bg-[#172231]">
-            <Database size={16} /> Демо-данные
-          </PrimaryButton>
+          {isAdmin && (
+            <PrimaryButton onClick={seed} className="inline-flex items-center gap-2 bg-ink text-cream hover:bg-[#172231]">
+              <Database size={16} /> Демо-данные
+            </PrimaryButton>
+          )}
           <PrimaryButton onClick={load} disabled={loading} className="inline-flex items-center gap-2">
             <RefreshCw size={16} /> Обновить
           </PrimaryButton>

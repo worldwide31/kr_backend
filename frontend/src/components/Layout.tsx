@@ -1,5 +1,6 @@
-import { Boxes, Building2, ClipboardList, LayoutDashboard, Package, Truck, Warehouse } from "lucide-react";
+import { Boxes, Building2, ClipboardList, LayoutDashboard, LogOut, Package, Truck, Warehouse } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../services/auth";
 
 const links = [
   { to: "/", label: "Обзор", icon: LayoutDashboard },
@@ -11,6 +12,7 @@ const links = [
 ];
 
 export function Layout() {
+  const { logout, user } = useAuth();
   return (
     <div className="min-h-screen">
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 border-r border-white/10 bg-ink lg:block">
@@ -20,7 +22,7 @@ export function Layout() {
           </div>
           <div>
             <div className="text-lg font-semibold text-cream">MuzFlow</div>
-            <div className="text-xs text-cream/60">Операторская панель</div>
+            <div className="text-xs text-cream/60">{user?.role === "admin" ? "Администратор" : "Оператор"}</div>
           </div>
         </div>
         <nav className="space-y-1 p-4">
@@ -52,8 +54,14 @@ export function Layout() {
           <div className="flex min-h-20 flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div>
               <div className="text-sm font-semibold text-ink">Веб-сервис управления поставками и заказами</div>
-              <div className="mt-1 text-xs text-muted">Музыкальный магазин · склады · поставки · заказы</div>
+              <div className="mt-1 text-xs text-muted">Музыкальный магазин · {user?.username} · {user?.role === "admin" ? "админ" : "оператор"}</div>
             </div>
+            <button
+              onClick={logout}
+              className="focus-ring hidden items-center gap-2 rounded-md border border-line bg-cream px-3 py-2 text-sm font-semibold text-ink shadow-soft transition hover:bg-[#eadcc4] sm:inline-flex"
+            >
+              <LogOut size={16} /> Выйти
+            </button>
             <nav className="flex gap-1 overflow-x-auto lg:hidden">
               {links.map(({ to, icon: Icon }) => (
                 <NavLink

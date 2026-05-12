@@ -3,9 +3,11 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { FieldHint, Notice, PageTitle, Panel, PrimaryButton, Table, TextInput } from "../components/ui";
 import { api } from "../services/api";
+import { useAuth } from "../services/auth";
 import type { Product } from "../types/domain";
 
 export function CatalogPage() {
+  const { isAdmin } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [message, setMessage] = useState<{ tone: "success" | "error" | "warning"; text: string } | null>(null);
   const [form, setForm] = useState({ sku: "", name: "", category: "", unit: "шт", purchase_price: "0", sale_price: "0", min_stock: "0" });
@@ -36,20 +38,24 @@ export function CatalogPage() {
         SKU используется как уникальный артикул. Новый товар не появляется на складе автоматически: пополните остаток через поставку.
       </Notice>
       {message && <Notice title={message.tone === "success" ? "Готово" : "Проверьте товар"} tone={message.tone}>{message.text}</Notice>}
-      <Panel className="mb-5 p-4">
-        <form className="grid gap-3 md:grid-cols-7" onSubmit={submit}>
-          <TextInput required placeholder="SKU" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
-          <TextInput required placeholder="Название" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <TextInput required placeholder="Категория" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-          <TextInput required placeholder="Ед." value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} />
-          <TextInput type="number" min="0" placeholder="Закупка" value={form.purchase_price} onChange={(e) => setForm({ ...form, purchase_price: e.target.value })} />
-          <TextInput type="number" min="0" placeholder="Продажа" value={form.sale_price} onChange={(e) => setForm({ ...form, sale_price: e.target.value })} />
-          <PrimaryButton className="inline-flex items-center justify-center gap-2"><Plus size={16} /> Добавить</PrimaryButton>
-        </form>
-        <FieldHint>
-          Минимальный остаток используется на странице склада: позиции ниже этого уровня помечаются как требующие пополнения.
-        </FieldHint>
-      </Panel>
+      {isAdmin ? (
+        <Panel className="mb-5 p-4">
+          <form className="grid gap-3 md:grid-cols-7" onSubmit={submit}>
+            <TextInput required placeholder="SKU" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
+            <TextInput required placeholder="Название" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <TextInput required placeholder="Категория" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+            <TextInput required placeholder="Ед." value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} />
+            <TextInput type="number" min="0" placeholder="Закупка" value={form.purchase_price} onChange={(e) => setForm({ ...form, purchase_price: e.target.value })} />
+            <TextInput type="number" min="0" placeholder="Продажа" value={form.sale_price} onChange={(e) => setForm({ ...form, sale_price: e.target.value })} />
+            <PrimaryButton className="inline-flex items-center justify-center gap-2"><Plus size={16} /> Добавить</PrimaryButton>
+          </form>
+          <FieldHint>
+            Минимальный остаток используется на странице склада: позиции ниже этого уровня помечаются как требующие пополнения.
+          </FieldHint>
+        </Panel>
+      ) : (
+        <Notice title="Режим оператора">Каталог доступен для просмотра. Добавление и изменение номенклатуры выполняет администратор.</Notice>
+      )}
       <Table>
         <table className="min-w-full divide-y divide-line text-sm">
           <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">

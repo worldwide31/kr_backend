@@ -43,6 +43,11 @@ services:
       MONGO_DB: supplyflow
       REDIS_URL: redis://redis:6379/0
       CORS_ORIGINS: http://localhost,http://localhost:5173
+      JWT_SECRET: supplyflow-demo-secret-change-me
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin123
+      OPERATOR_USERNAME: operator
+      OPERATOR_PASSWORD: operator123
     depends_on:
       postgres:
         condition: service_healthy
@@ -73,4 +78,3 @@ volumes:
   postgres_data:
   mongo_data:
   redis_data:
-
