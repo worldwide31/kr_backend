@@ -28,6 +28,35 @@ docker compose up --build
 
 Администратор управляет справочниками и демо-данными. Оператор работает с заказами, поставками и складскими остатками.
 
+## CI/CD
+
+В проекте настроен GitHub Actions workflow `.github/workflows/ci-cd.yml`.
+
+Pipeline выполняет:
+
+- проверку `docker compose config`;
+- сборку всех сервисов;
+- запуск полного стека;
+- smoke-тест `/api/health`;
+- проверку входа администратора;
+- публикацию Docker-образов в GitHub Container Registry при push в `main`.
+
+Публикуемые образы:
+
+- `ghcr.io/worldwide31/kr_backend-api:latest`
+- `ghcr.io/worldwide31/kr_backend-frontend:latest`
+
+## Production Compose
+
+Для запуска из опубликованных образов:
+
+```bash
+cp .env.production.example .env.production
+docker compose --env-file .env.production -f docker-compose.prod.yml up -d
+```
+
+Перед запуском замените пароли и `JWT_SECRET` в `.env.production`.
+
 ## Структура
 
 ```text
