@@ -14,6 +14,6 @@
       "label": "MuzFlow API"
     }
   },
-  "postCreateCommand": "docker compose -f docker-compose.yml -f docker-compose.codespaces.yml build",
-  "postStartCommand": "docker compose -f docker-compose.yml -f docker-compose.codespaces.yml up -d"
+  "postCreateCommand": "chmod +x .devcontainer/scripts/start.sh",
+  "postStartCommand": ".devcontainer/scripts/start.sh"
 }
